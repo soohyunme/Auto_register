@@ -19,7 +19,7 @@
 
 
 ### 최종업데이트
- Auto_register v1.0 (2021.07.25)
+ Auto_register v1.1 (2021.07.25)
 
 ### 오류 사항 및 문의 사항
  soohyun.dev@gmail.com
