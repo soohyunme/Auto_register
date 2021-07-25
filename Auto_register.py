@@ -16,9 +16,56 @@ file_name = 'userDate'
 user_id = ''
 user_pw = ''
 url = ''
-today = '07.21'
+today = datetime.now().strftime('%m.%d')
 month = datetime.now().strftime('%m')
 day = datetime.now().strftime('%d')
+
+def login(id,pw):
+    browser.find_element_by_xpath('//*[@id="btn-login"]').click()
+    browser.implicitly_wait(5)
+    browser.find_element_by_xpath('//*[@id="username"]').send_keys(id)
+    browser.find_element_by_xpath('//*[@id="password"]').send_keys(pw)
+    browser.find_element_by_xpath('//*[@id="btn-login"]').click()
+    browser.implicitly_wait(5)
+    
+    if browser.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[6]/ul/li/a').text == '로그인':
+        ctypes.windll.user32.MessageBoxW(None, '아이디와 비밀번호를 확인해주세요.',"로그인 오류", 0)
+        sys.exit()
+    
+def register_today_study():
+    path = '//ul/li/div/div/div[2]'
+    btn_path = path+'/button'
+    contents =browser.find_elements_by_xpath(path)
+    btns = browser.find_elements_by_xpath(btn_path)
+    page_tag = browser.find_element_by_xpath('//div/div[4]/ul').text
+    for i in contents:
+        if today in i.text:
+            btns[contents.index(i)].click()
+            try: 
+                WebDriverWait(browser, 5).until(EC.alert_is_present(), 'Timed out waiting for alerts to appear')
+                alert= browser.switch_to.alert
+                alert.accept()
+            except:
+                pass
+            break
+
+        elif i == contents[-1]:
+            if page_tag == '다음':
+                browser.find_element_by_xpath('//*[@id="btn-next"]').click()
+            else:
+                ctypes.windll.user32.MessageBoxW(None, f'{month}월 {day}일에 해당하는 강의가 없습니다.',"강의 검색 오류", 0)
+                sys.exit()
+                return
+            register_today_study()
+            break
+    return
+
+def click_xpath(path):
+    browser.find_element_by_xpath(path).click()
+    browser.implicitly_wait(5)
+    return 
+
+
 try :
     with open(file_name,'r',encoding='utf-8') as f:
         info = f.read()
@@ -53,50 +100,12 @@ else:
 browser.get(url)
 browser.implicitly_wait(5)
 
-browser.find_element_by_xpath('//*[@id="btn-login"]').click()
-browser.implicitly_wait(5)
-browser.find_element_by_xpath('//*[@id="username"]').send_keys(user_id)
-browser.find_element_by_xpath('//*[@id="password"]').send_keys(user_pw)
-browser.find_element_by_xpath('//*[@id="btn-login"]').click()
-browser.implicitly_wait(5)
 
-if browser.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[6]/ul/li/a').text == '로그인':
-    ctypes.windll.user32.MessageBoxW(None, '아이디와 비밀번호를 확인해주세요.',"로그인 오류", 0)
-    sys.exit()
-
-def register_today_study():
-    path = '//ul/li/div/div/div[2]'
-    btn_path = path+'/button'
-    contents =browser.find_elements_by_xpath(path)
-    btns = browser.find_elements_by_xpath(btn_path)
-    page_tag = browser.find_element_by_xpath('//div/div[4]/ul').text
-    for i in contents:
-        if today in i.text:
-            btns[contents.index(i)].click()
-            try: 
-                WebDriverWait(browser, 5).until(EC.alert_is_present(), 'Timed out waiting for alerts to appear')
-                alert= browser.switch_to.alert
-                alert.accept()
-            except:
-                pass
-            break
-
-        elif i == contents[-1]:
-            if page_tag == '다음':
-                browser.find_element_by_xpath('//*[@id="btn-next"]').click()
-            else:
-                ctypes.windll.user32.MessageBoxW(None, f'{month}월 {day}일에 해당하는 강의가 없습니다.',"강의 검색 오류", 0)
-                sys.exit()
-                return
-            register_today_study()
-            break
-    return
-
-browser.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[1]/a').click()
-browser.implicitly_wait(5)
+login(user_id,user_pw)
+    
+click_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[1]/a')
 register_today_study()
 
-browser.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[4]/a').click()
-browser.implicitly_wait(5)
+click_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[4]/a')
 register_today_study()
 
