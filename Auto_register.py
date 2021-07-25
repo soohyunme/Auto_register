@@ -21,12 +21,10 @@ month = datetime.now().strftime('%m')
 day = datetime.now().strftime('%d')
 
 def login(id,pw):
-    browser.find_element_by_xpath('//*[@id="btn-login"]').click()
-    browser.implicitly_wait(5)
+    click_xpath('//*[@id="btn-login"]')
     browser.find_element_by_xpath('//*[@id="username"]').send_keys(id)
     browser.find_element_by_xpath('//*[@id="password"]').send_keys(pw)
-    browser.find_element_by_xpath('//*[@id="btn-login"]').click()
-    browser.implicitly_wait(5)
+    click_xpath('//*[@id="btn-login"]')
     
     if browser.find_element_by_xpath('/html/body/div[1]/div[1]/div[2]/ul/li[6]/ul/li/a').text == '로그인':
         ctypes.windll.user32.MessageBoxW(None, '아이디와 비밀번호를 확인해주세요.',"로그인 오류", 0)
@@ -51,7 +49,7 @@ def register_today_study():
 
         elif i == contents[-1]:
             if page_tag == '다음':
-                browser.find_element_by_xpath('//*[@id="btn-next"]').click()
+                click_xpath('//*[@id="btn-next"]')
             else:
                 ctypes.windll.user32.MessageBoxW(None, f'{month}월 {day}일에 해당하는 강의가 없습니다.',"강의 검색 오류", 0)
                 sys.exit()
