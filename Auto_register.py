@@ -12,7 +12,7 @@ console_hwnd = ctypes.windll.kernel32.GetConsoleWindow ()
 ctypes.windll.user32.ShowWindow (console_hwnd, subprocess.SW_HIDE)
 
 os_path = os.getcwd()
-file_name = 'userDate'
+file_name = 'userData'
 user_id = ''
 user_pw = ''
 url = ''
