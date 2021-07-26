@@ -16,6 +16,8 @@ file_name = 'userDate'
 user_id = ''
 user_pw = ''
 url = ''
+register_flag = False
+class_counter = 0
 today = datetime.now().strftime('%m.%d')
 month = datetime.now().strftime('%m')
 day = datetime.now().strftime('%d')
@@ -31,14 +33,15 @@ def login(id,pw):
         sys.exit()
     
 def register_today_study():
-    register_flag = False
+    global register_flag, class_counter
     path = '//ul/li/div/div/div[2]'
     contents = browser.find_elements_by_xpath(path)
     btns = browser.find_elements_by_xpath(path+'/button')
-    page_tag = browser.find_element_by_xpath('//div/div[4]/ul').text
+    page_tag = browser.find_element_by_css_selector('div > div.buttonMultiContainer').text
     for i in contents:
         if today in i.text:
             btns[contents.index(i)].click()
+            class_counter +=1
             register_flag = True
             try: 
                 WebDriverWait(browser, 5).until(EC.alert_is_present(), 'Timed out waiting for alerts to appear')
@@ -47,7 +50,7 @@ def register_today_study():
             except:
                 pass
         if i == contents[-1]:
-            if page_tag == '다음':
+            if '다음' in page_tag:
                 click_xpath('//*[@id="btn-next"]')
                 register_today_study()
             elif(register_flag==False):
@@ -58,17 +61,18 @@ def register_today_study():
     return
 
 def enter_class():
-    
     path = '//ul/li/div/div/div[2]'
-    titles = browser.find_elements_by_xpath(path+'/h1')
     contents =browser.find_elements_by_xpath(path)
     btns = browser.find_elements_by_xpath(path+'/button')
-    page_tag = browser.find_element_by_xpath('//div/div[4]/ul').text
+    page_tag = browser.find_element_by_css_selector('div > div.buttonMultiContainer').text
     for i in contents:
         if today in i.text:
             browser.execute_script("arguments[0].style.backgroundColor = 'yellow'; return arguments[0];", i)
             webdriver.ActionChains(browser).drag_and_drop_by_offset(i,0,0).perform()
-            if enter_disable == False:
+            if class_counter == 1:
+                btns[contents.index(i)].click()
+                return
+            elif (enter_disable == False) and (class_counter>=2):
                 mbox_flag = ctypes.windll.user32.MessageBoxW(None, '해당 강의가 맞나요?',"강의 입장 확인", 4) # 6 = True, 7 = False
                 if mbox_flag == 6:
                     btns[contents.index(i)].click()
@@ -76,7 +80,7 @@ def enter_class():
             else:
                 return
         if i == contents[-1]:
-            if page_tag == '다음':
+            if '다음' in page_tag:
                 click_xpath('//*[@id="btn-next"]')
                 enter_class()
             else:
